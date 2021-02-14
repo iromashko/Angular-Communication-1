@@ -8,6 +8,7 @@ import {
   ViewChildren,
 } from "@angular/core";
 import { NgModel } from "@angular/forms";
+import { Subscription } from "rxjs/Subscription";
 
 import { IProduct } from "./product";
 import { ProductService } from "./product.service";
@@ -17,12 +18,15 @@ import { ProductService } from "./product.service";
   styleUrls: ["./product-list.component.css"],
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
-  @ViewChild("filterElement")
-  filterElementRef: ElementRef;
+  @ViewChild("filterElement") filterElementRef: ElementRef;
+
+  @ViewChild(NgModel) filterInput: NgModel;
+
+  private _sub: Subscription;
 
   pageTitle: string = "Product List";
   showImage: boolean;
-
+  listFilter: string;
   imageWidth: number = 50;
   imageMargin: number = 2;
   errorMessage: string;
@@ -30,18 +34,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   filteredProducts: IProduct[];
   products: IProduct[];
 
-  private _listFilter: string;
-  get listFilter(): string {
-    return this._listFilter;
-  }
-  set listFilter(value: string) {
-    this._listFilter = value;
-    this.performFilter(this.listFilter);
-  }
-
   constructor(private productService: ProductService) {}
 
   ngAfterViewInit(): void {
+    this.filterInput.valueChanges.subscribe(() =>
+      this.performFilter(this.listFilter)
+    );
     this.filterElementRef.nativeElement.focus();
   }
 
