@@ -30,7 +30,7 @@ import { ProductEditGuard } from './edit/product-edit-guard.service';
   ],
   providers: [
     ProductService,
-    ProductEditGuard
+    ProductEditGuard,
   ]
 })
 export class ProductModule { }
