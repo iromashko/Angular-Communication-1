@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { CriteriaComponent } from "../shared/criteria/criteria.component";
 
 import { IProduct } from "./product";
 import { ProductService } from "./product.service";
@@ -7,10 +8,12 @@ import { ProductService } from "./product.service";
   templateUrl: "./product-list.component.html",
   styleUrls: ["./product-list.component.css"],
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, AfterViewInit {
   pageTitle: string = "Product List";
   showImage: boolean;
   includeDetail: boolean = true;
+  @ViewChild(CriteriaComponent) filterComponent: CriteriaComponent;
+  parentListFilter: string;
 
   imageWidth: number = 50;
   imageMargin: number = 2;
@@ -21,11 +24,15 @@ export class ProductListComponent implements OnInit {
 
   constructor(private productService: ProductService) {}
 
+  ngAfterViewInit(): void {
+    this.parentListFilter = this.filterComponent.listFilter;
+  }
+
   ngOnInit(): void {
     this.productService.getProducts().subscribe(
       (products: IProduct[]) => {
         this.products = products;
-        this.performFilter();
+        this.performFilter(this.parentListFilter);
       },
       (error: any) => (this.errorMessage = <any>error)
     );
@@ -46,5 +53,9 @@ export class ProductListComponent implements OnInit {
     } else {
       this.filteredProducts = this.products;
     }
+  }
+
+  onValueChange(value: string): void {
+    this.performFilter(value);
   }
 }
